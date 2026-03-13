@@ -146,32 +146,60 @@
 ## 현재 파일 구조
 
 ```
-src/
-├── types/
-│   └── index.ts
-├── data/
-│   ├── runbooks.json
-│   ├── incidents.json
-│   └── sample-logs/
-│       ├── db-connection-pool-error.log
-│       ├── api-5xx-error.log
-│       └── redis-oom-error.log
-├── services/
-│   ├── claude.ts
-│   ├── incidentMatcher.ts
-│   └── mock.ts
-├── components/
-│   ├── Layout.tsx
-│   ├── IncidentInput.tsx
-│   ├── RecentIncidents.tsx
-│   ├── AnalysisView.tsx
-│   ├── RunbookList.tsx
-│   ├── Checklist.tsx
-│   ├── PastIncidents.tsx
-│   └── Timeline.tsx
-├── App.tsx
-├── main.tsx
-└── index.css
+IncidentPilot/
+├── .claude/
+├── .git/
+├── doc/
+│   ├── PROD.md
+│   └── ROADMAP.md
+├── frontend/                        # 프론트엔드 (Vite + React)
+│   ├── src/
+│   │   ├── types/
+│   │   │   └── index.ts
+│   │   ├── data/
+│   │   │   ├── runbooks.json
+│   │   │   ├── incidents.json
+│   │   │   └── sample-logs/
+│   │   │       ├── db-connection-pool-error.log
+│   │   │       ├── api-5xx-error.log
+│   │   │       └── redis-oom-error.log
+│   │   ├── services/
+│   │   │   ├── claude.ts
+│   │   │   ├── incidentMatcher.ts
+│   │   │   └── mock.ts
+│   │   ├── components/
+│   │   │   ├── Layout.tsx
+│   │   │   ├── IncidentInput.tsx
+│   │   │   ├── RecentIncidents.tsx
+│   │   │   ├── AnalysisView.tsx
+│   │   │   ├── RunbookList.tsx
+│   │   │   ├── Checklist.tsx
+│   │   │   ├── PastIncidents.tsx
+│   │   │   ├── StatsBar.tsx
+│   │   │   ├── RunbookCatalog.tsx
+│   │   │   └── Timeline.tsx
+│   │   ├── App.tsx
+│   │   ├── main.tsx
+│   │   └── index.css
+│   ├── public/
+│   ├── package.json
+│   └── vite.config.ts
+└── backend/                         # 백엔드 (FastAPI) — 개발 예정
+    ├── app/
+    │   ├── main.py
+    │   ├── api/
+    │   │   ├── analyze.py
+    │   │   ├── runbooks.py
+    │   │   └── incidents.py
+    │   ├── services/
+    │   │   ├── matcher.py
+    │   │   └── extractor.py
+    │   ├── models/
+    │   │   ├── runbook.py
+    │   │   └── incident.py
+    │   └── db.py
+    ├── Dockerfile
+    └── requirements.txt
 ```
 
 ---
