@@ -1,0 +1,21 @@
+2025-10-10 02:40:01.123 WARN  [session-service] Redis memory usage: 95% (7.6GB / 8GB)
+2025-10-10 02:41:15.456 ERROR [session-service] [redis-client-1] redis.clients.jedis.exceptions.JedisDataException: OOM command not allowed when used memory > 'maxmemory'.
+	at redis.clients.jedis.Protocol.processError(Protocol.java:132)
+	at redis.clients.jedis.Protocol.process(Protocol.java:166)
+	at redis.clients.jedis.Protocol.read(Protocol.java:220)
+
+2025-10-10 02:41:15.678 ERROR [session-service] [http-nio-8080-exec-5] c.e.session.service.SessionService - Failed to create session for user 8821: OOM command not allowed when used memory > 'maxmemory'
+2025-10-10 02:41:16.001 ERROR [session-service] POST /api/v1/auth/login returned 500
+2025-10-10 02:41:16.234 ERROR [session-service] [http-nio-8080-exec-7] - Failed to store session: Redis OOM
+2025-10-10 02:41:16.567 ERROR [session-service] POST /api/v1/auth/login returned 500
+2025-10-10 02:41:17.012 WARN  [session-service] Redis WARN: 8189489152 bytes used, 8589934592 bytes max RSS memory
+2025-10-10 02:41:17.345 ERROR [session-service] [http-nio-8080-exec-10] - Cannot allocate memory in static TLS block
+redis.clients.jedis.exceptions.JedisDataException: OOM command not allowed when used memory > 'maxmemory'.
+2025-10-10 02:41:20.456 ERROR [session-service] Login failure rate: 100% - All session creation attempts failing
+2025-10-10 02:41:25.789 WARN  [redis-server] # WARNING: 32 bit instance detected but no memory limit set. Setting 3 GB maxmemory limit with 'noeviction' policy now.
+2025-10-10 02:41:30.012 ERROR [session-service] [http-nio-8080-exec-15] redis.clients.jedis.exceptions.JedisDataException: OOM command not allowed when used memory > 'maxmemory'.
+2025-10-10 02:41:35.234 ERROR [session-service] 25 consecutive login failures in last 30 seconds
+2025-10-10 02:41:40.567 INFO  [ops-team] Starting Redis memory cleanup procedure
+2025-10-10 02:42:00.001 INFO  [ops-team] Deleted 450,000 expired session keys (freed 2.1GB)
+2025-10-10 02:42:30.234 INFO  [session-service] Redis memory usage normalized: 55% (4.4GB / 8GB)
+2025-10-10 02:43:00.456 INFO  [session-service] Service restored. Login success rate: 100%

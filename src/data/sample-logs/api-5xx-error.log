@@ -1,0 +1,22 @@
+2025-10-28 14:10:01.123 INFO  [payment-service] Deployment v2.3.1 started
+2025-10-28 14:10:45.456 INFO  [payment-service] Application started successfully on port 8080
+2025-10-28 14:11:00.789 ERROR [payment-service] [http-nio-8080-exec-1] c.e.payment.service.PaymentService - Column 'transaction_metadata' not found in result set
+org.springframework.jdbc.BadSqlGrammarException: PreparedStatementCallback; bad SQL grammar [SELECT id, amount, status, transaction_metadata FROM payments WHERE id = ?]; nested exception is java.sql.SQLException: Column 'transaction_metadata' not found in result set
+	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:101)
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:70)
+Caused by: java.sql.SQLException: Column 'transaction_metadata' not found in result set
+
+2025-10-28 14:11:01.012 ERROR [payment-service] [http-nio-8080-exec-2] POST /api/v1/payments returned 500
+2025-10-28 14:11:01.234 ERROR [payment-service] [http-nio-8080-exec-3] GET /api/v1/payments/history returned 500
+2025-10-28 14:11:01.456 ERROR [payment-service] [http-nio-8080-exec-4] POST /api/v1/payments/refund returned 500
+2025-10-28 14:11:02.001 ERROR [payment-service] [http-nio-8080-exec-5] - Column 'transaction_metadata' not found in result set
+2025-10-28 14:11:02.234 ERROR [payment-service] [http-nio-8080-exec-6] POST /api/v1/payments returned 500
+2025-10-28 14:11:02.567 WARN  [payment-service] Health check endpoint /health returned status: DOWN
+2025-10-28 14:11:03.001 ERROR [payment-service] [http-nio-8080-exec-8] GET /api/v1/payments/123 returned 500
+2025-10-28 14:11:03.234 ERROR [payment-service] [http-nio-8080-exec-9] - Failed to process payment request: database schema mismatch
+2025-10-28 14:11:05.456 ERROR [payment-service] 5xx error rate: 100% (45/45 requests in last 60s)
+2025-10-28 14:11:10.789 ERROR [payment-service] [http-nio-8080-exec-15] POST /api/v1/payments returned 503
+2025-10-28 14:11:15.012 WARN  [api-gateway] Circuit breaker OPEN for payment-service after 10 consecutive failures
+2025-10-28 14:11:20.234 ERROR [payment-service] [http-nio-8080-exec-20] - SchemaValidationException: Migration V20251028__add_transaction_metadata.sql not executed
+2025-10-28 14:12:00.000 INFO  [payment-service] Initiating rollback to v2.3.0
+2025-10-28 14:13:30.456 INFO  [payment-service] Rollback completed. Service restored.

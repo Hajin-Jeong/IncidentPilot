@@ -1,0 +1,24 @@
+2025-11-15 09:20:01.234 ERROR [user-api] [http-nio-8080-exec-12] c.e.userapi.repository.UserRepository - HikariPool-1 - Connection is not available, request timed out after 30000ms.
+2025-11-15 09:20:01.567 ERROR [user-api] [http-nio-8080-exec-15] c.e.userapi.service.UserService - Failed to acquire database connection
+org.springframework.dao.DataAccessResourceFailureException: Unable to acquire JDBC Connection; nested exception is org.hibernate.exception.JDBCConnectionException: Unable to acquire JDBC Connection
+	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.convertHibernateAccessException(HibernateJpaDialect.java:333)
+	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:255)
+Caused by: java.sql.SQLTransientConnectionException: HikariPool-1 - Connection is not available, request timed out after 30000ms.
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:213)
+	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:100)
+
+2025-11-15 09:20:02.001 WARN  [user-api] [HikariPool-1 housekeeper] c.z.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m22s413ms).
+2025-11-15 09:20:02.345 ERROR [user-api] [http-nio-8080-exec-18] c.e.userapi.controller.UserController - GET /api/v1/users/profile returned 500
+2025-11-15 09:20:02.678 ERROR [user-api] [http-nio-8080-exec-20] c.e.userapi.repository.UserRepository - HikariPool-1 - Connection is not available, request timed out after 30000ms.
+2025-11-15 09:20:03.012 INFO  [user-api] [HikariPool-1 housekeeper] c.z.hikari.pool.HikariPool - HikariPool-1 - Pool stats (total=10, active=10, idle=0, waiting=45)
+2025-11-15 09:20:03.234 ERROR [user-api] [http-nio-8080-exec-22] c.e.userapi.service.AuthService - Cannot login user: database unavailable
+2025-11-15 09:20:03.456 ERROR [user-api] [http-nio-8080-exec-25] c.e.userapi.repository.OrderRepository - HikariPool-1 - Connection is not available, request timed out after 30000ms.
+2025-11-15 09:20:04.123 ERROR [user-api] [http-nio-8080-exec-27] c.e.userapi.service.ProfileService - Failed to load user profile: connection pool exhausted
+2025-11-15 09:20:04.567 WARN  [user-api] [HikariPool-1 housekeeper] c.z.hikari.pool.HikariPool - HikariPool-1 - Pool stats (total=10, active=10, idle=0, waiting=67)
+2025-11-15 09:20:05.001 ERROR [user-api] [http-nio-8080-exec-30] c.e.userapi.controller.GlobalExceptionHandler - Unhandled exception in request processing
+com.zaxxer.hikari.pool.HikariPool$PoolInitializationException: Failed to initialize pool: FATAL: remaining connection slots are reserved for non-replication superuser connections
+	at com.zaxxer.hikari.pool.HikariPool.checkFailFast(HikariPool.java:576)
+2025-11-15 09:20:05.234 ERROR [user-api] [http-nio-8080-exec-32] - POST /api/v1/auth/login returned 503 Service Unavailable
+2025-11-15 09:20:05.678 ERROR [user-api] [http-nio-8080-exec-35] - GET /api/v1/users/123 returned 503 Service Unavailable
+2025-11-15 09:20:06.012 ERROR [user-api] [http-nio-8080-exec-37] - POST /api/v1/orders returned 503 Service Unavailable
+2025-11-15 09:20:06.345 FATAL [user-api] [main] c.e.userapi.Application - Critical: Database connection pool fully exhausted. Service degraded.

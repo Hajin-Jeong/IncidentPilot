@@ -1,0 +1,145 @@
+[
+  {
+    "id": "inc-001",
+    "date": "2025-11-15T09:23:00Z",
+    "service": "user-api",
+    "symptom": "API 응답시간 10초 이상 지연, DB 커넥션 에러 다수 발생",
+    "cause": "커넥션 풀 크기 설정 오류 (max=10)로 트래픽 증가 시 커넥션 고갈",
+    "resolution": "커넥션 풀 max를 50으로 증가, 유휴 커넥션 정리 후 서비스 재시작",
+    "durationMinutes": 45,
+    "severity": "P1",
+    "relatedRunbookId": "rb-001"
+  },
+  {
+    "id": "inc-002",
+    "date": "2025-10-28T14:17:00Z",
+    "service": "payment-service",
+    "symptom": "결제 API 503 에러, 전체 결제 불가 상태",
+    "cause": "신규 배포 후 DB 마이그레이션 스크립트 실행 실패로 테이블 스키마 불일치",
+    "resolution": "이전 버전으로 롤백 후 마이그레이션 스크립트 수정 재배포",
+    "durationMinutes": 28,
+    "severity": "P1",
+    "relatedRunbookId": "rb-002"
+  },
+  {
+    "id": "inc-003",
+    "date": "2025-10-10T02:45:00Z",
+    "service": "session-service",
+    "symptom": "로그인 불가, Redis OOM 에러, 세션 생성 실패",
+    "cause": "세션 데이터에 TTL 미설정으로 Redis 메모리 점진적 소진",
+    "resolution": "불필요 세션 데이터 삭제, TTL 24시간 설정, maxmemory-policy allkeys-lru 적용",
+    "durationMinutes": 35,
+    "severity": "P1",
+    "relatedRunbookId": "rb-003"
+  },
+  {
+    "id": "inc-004",
+    "date": "2025-09-22T11:30:00Z",
+    "service": "log-aggregator",
+    "symptom": "서비스 서버 디스크 90% 이상 사용, 로그 쓰기 실패",
+    "cause": "로그 로테이션 설정 누락으로 application.log 파일이 100GB 이상 증가",
+    "resolution": "오래된 로그 압축/삭제, logrotate 설정 추가",
+    "durationMinutes": 20,
+    "severity": "P2",
+    "relatedRunbookId": "rb-004"
+  },
+  {
+    "id": "inc-005",
+    "date": "2025-09-05T08:00:00Z",
+    "service": "api-gateway",
+    "symptom": "HTTPS 접속 불가, SSL 인증서 만료 오류",
+    "cause": "cert-manager 자동 갱신 실패 (DNS 챌린지 권한 오류)",
+    "resolution": "cert-manager 권한 수정 후 인증서 수동 갱신, 자동 갱신 재활성화",
+    "durationMinutes": 60,
+    "severity": "P1",
+    "relatedRunbookId": "rb-005"
+  },
+  {
+    "id": "inc-006",
+    "date": "2025-08-18T16:50:00Z",
+    "service": "order-processor",
+    "symptom": "주문 처리 지연, Kafka 컨슈머 랙 5만 이상 급증",
+    "cause": "외부 결제 API 응답 지연(3초)으로 컨슈머 처리량 저하",
+    "resolution": "컨슈머 인스턴스 2 → 8로 스케일아웃, 결제 API 타임아웃 1초로 단축 및 재시도 로직 추가",
+    "durationMinutes": 40,
+    "severity": "P2",
+    "relatedRunbookId": "rb-006"
+  },
+  {
+    "id": "inc-007",
+    "date": "2025-07-30T20:12:00Z",
+    "service": "user-api",
+    "symptom": "특정 시간대 DB 커넥션 타임아웃 에러 급증",
+    "cause": "배치 작업이 동일 DB에 대량의 쿼리를 실행하여 커넥션 선점",
+    "resolution": "배치 작업 전용 DB read replica 분리, 커넥션 풀 분리 구성",
+    "durationMinutes": 55,
+    "severity": "P2",
+    "relatedRunbookId": "rb-001"
+  },
+  {
+    "id": "inc-008",
+    "date": "2025-07-15T10:05:00Z",
+    "service": "product-api",
+    "symptom": "상품 조회 API 500 에러, NullPointerException 스택트레이스",
+    "cause": "신규 기능 배포 시 null 체크 누락된 코드 배포",
+    "resolution": "즉시 롤백 후 null 체크 추가하여 재배포",
+    "durationMinutes": 15,
+    "severity": "P2",
+    "relatedRunbookId": "rb-002"
+  },
+  {
+    "id": "inc-009",
+    "date": "2025-06-20T03:30:00Z",
+    "service": "cache-service",
+    "symptom": "Redis SLOWLOG 급증, 캐시 히트율 0%로 하락",
+    "cause": "대용량 키(100MB+) 캐싱으로 Redis 단일 스레드 블로킹 발생",
+    "resolution": "대용량 캐시 키 삭제, 분할 캐싱 로직으로 재구현",
+    "durationMinutes": 30,
+    "severity": "P2",
+    "relatedRunbookId": "rb-003"
+  },
+  {
+    "id": "inc-010",
+    "date": "2025-05-28T09:45:00Z",
+    "service": "media-server",
+    "symptom": "이미지 업로드 실패, 디스크 full 에러",
+    "cause": "임시 파일 정리 프로세스 중단으로 /tmp 디렉토리 100GB 초과",
+    "resolution": "임시 파일 삭제 후 정리 스크립트 cron 재등록",
+    "durationMinutes": 25,
+    "severity": "P2",
+    "relatedRunbookId": "rb-004"
+  },
+  {
+    "id": "inc-011",
+    "date": "2025-05-10T14:22:00Z",
+    "service": "notification-service",
+    "symptom": "알림 발송 수 시간당 1만 → 0으로 급감, Kafka 랙 급증",
+    "cause": "알림 템플릿 파싱 오류로 컨슈머 무한 예외 반복 처리",
+    "resolution": "Dead Letter Queue 설정, 파싱 오류 키 격리 후 컨슈머 재시작",
+    "durationMinutes": 50,
+    "severity": "P2",
+    "relatedRunbookId": "rb-006"
+  },
+  {
+    "id": "inc-012",
+    "date": "2025-04-15T07:18:00Z",
+    "service": "auth-service",
+    "symptom": "전체 서비스 로그인 불가, 500 에러",
+    "cause": "JWT 서명 키 만료, 토큰 검증 실패",
+    "resolution": "새 서명 키 생성 후 환경변수 업데이트, 서비스 재배포",
+    "durationMinutes": 22,
+    "severity": "P1",
+    "relatedRunbookId": "rb-002"
+  },
+  {
+    "id": "inc-013",
+    "date": "2025-03-22T16:40:00Z",
+    "service": "search-service",
+    "symptom": "검색 API 응답시간 30초 이상, 타임아웃 다수",
+    "cause": "Elasticsearch 힙 메모리 95% 도달, GC 오버헤드로 성능 저하",
+    "resolution": "힙 메모리 8GB → 16GB 증설, 불필요 인덱스 삭제",
+    "durationMinutes": 65,
+    "severity": "P2",
+    "relatedRunbookId": "rb-003"
+  }
+]
