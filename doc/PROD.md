@@ -1,6 +1,6 @@
-# IncidentPilot — PRD (Product Requirements Document) v2.0
+# IncidentPilot — PRD (Product Requirements Document) v2.1
 > 📁 `D:\Work\Hackathon\IncidentPilot\doc\PROD.md`
-> v1.0 → v2.0: Claude API 직접 호출 제거, 자체 백엔드 도입
+> v2.0 → v2.1: Mock 모드 전용 자체 백엔드 도입. Claude API는 실제 분석에 유지.
 
 ## 1. 프로젝트 개요
 
@@ -9,7 +9,7 @@
 | **프로젝트명** | IncidentPilot |
 | **한 줄 소개** | 장애 알림을 입력하면 AI가 런북을 자동 매칭하고, 단계별 대응 체크리스트를 제공하는 웹 대시보드 |
 | **형태** | 프론트엔드 + 백엔드 분리형 웹앱 |
-| **데이터** | 백엔드 DB 기반 (런북, 장애 이력 CRUD) |
+| **데이터** | 백엔드 DB 기반 (런북, 장애 이력 관리) |
 
 ---
 
@@ -33,186 +33,188 @@
 
 ### 기능 1: 장애 입력 → 런북 자동 매칭
 **입력 방식 (2가지 지원)**
-- **A. 로그파일 업로드**: 로그 파일(.log, .txt)을 드래그앤드롭 또는 파일 선택으로 업로드 → 백엔드가 핵심 에러 자동 추출 → 런북 매칭
-- **B. 텍스트 직접 입력**: 에러 메시지, 알림 내용을 직접 텍스트로 입력 → 런북 매칭
-
-**처리**: 백엔드 AI 엔진이 입력된 장애 정보를 분석하여 등록된 런북과 벡터 유사도 기반으로 매칭
+- **A. 로그파일 업로드**: 로그 파일(.log, .txt)을 드래그앤드롭 또는 파일 선택으로 업로드
+- **B. 텍스트 직접 입력**: 에러 메시지, 알림 내용을 직접 텍스트로 입력
 
 **출력**
 - 관련도 높은 런북 1~3개를 랭킹과 함께 표시
 - 매칭 신뢰도(%) 표시, 매칭 근거 요약
-- (로그파일 업로드 시) 추출한 핵심 에러 요약 별도 표시
+- 로그 업로드 시 추출한 핵심 에러 요약 표시
 
 ### 기능 2: 체크리스트 기반 대응 가이드
 - 매칭된 런북을 단계별 체크리스트로 변환하여 표시
-- 각 단계 완료 체크 가능 + 진행 상태 백엔드 저장
-- 현재 진행 단계 하이라이트, 단계별 예상 소요시간 표시
-- 타임라인 자동 기록 (몇 시 몇 분에 어떤 단계 완료)
+- 각 단계 완료 체크, 현재 진행 단계 하이라이트, 예상 소요시간 표시
+- 타임라인 자동 기록
 
 ### 기능 3: 과거 유사 장애 이력 조회
-- 입력된 장애 정보와 유사한 과거 장애 목록 표시 (벡터 유사도 검색)
-- 각 이력에 발생일, 원인, 해결방법, 소요시간 요약
-- 인사이트 문구 제공
+- 유사한 과거 장애 목록 및 인사이트 문구 제공
 
-### 기능 4: 런북 & 장애 이력 관리 (백엔드 신규)
-- 런북 CRUD API (등록 / 조회 / 수정 / 삭제)
-- 장애 이력 저장 API (대응 완료 후 자동 저장)
-- 런북/장애 데이터 임베딩 벡터 자동 생성 및 저장
+### 기능 4: 런북 & 장애 이력 관리 API (백엔드)
+- 런북 CRUD
+- 장애 이력 조회/저장
 
 ---
 
 ## 4. 화면 구성
 
 ### 4-1. 메인 대시보드
-- 장애 입력 영역: 로그파일 드래그앤드롭 존 + 텍스트 직접 입력 탭 전환
-- "분석 시작" 버튼
-- 운영 현황 통계 (런북 수, 누적 장애, P1 건수, 평균 해결시간)
-- 최근 장애 이력 + 런북 카탈로그
+- 장애 입력 영역 (파일 업로드 + 텍스트 입력)
+- 운영 현황 통계, 최근 장애 이력, 런북 카탈로그
+- **AI 모드 / Mock 모드 토글** (우측 상단)
 
 ### 4-2. 분석 결과 화면 (3-Column 레이아웃)
-- **좌측**: 매칭된 런북 목록 (랭킹, 신뢰도, 매칭 근거)
-- **중앙**: 선택한 런북의 체크리스트 (대응 가이드)
-- **우측**: 유사 과거 장애 이력 패널 / 대응 타임라인
-
-### 4-3. 장애 타임라인 뷰
-- 체크리스트 진행 중 자동 기록되는 타임라인
-- 각 단계 완료 시각, 전체 대응 소요시간
+- **좌측**: 매칭 런북 목록 (랭킹, 신뢰도, 근거)
+- **중앙**: 체크리스트 대응 가이드
+- **우측**: 유사 과거 장애 이력 / 대응 타임라인
 
 ---
 
-## 5. 기술 구성 (v2.0)
+## 5. 분석 모드 설계 (핵심)
+
+IncidentPilot은 두 가지 분석 모드를 지원합니다. 프론트엔드에서 모드를 선택하면 호출 대상이 달라집니다.
+
+```
+┌─────────────────────────────────────────────────────┐
+│                   Frontend (React)                   │
+│                                                      │
+│   [AI 모드 토글] ──────────────── [Mock 모드 토글]    │
+│         │                                │          │
+│         ▼                                ▼          │
+│  Claude API 직접 호출          Backend API 호출      │
+│  (브라우저 → Anthropic)        (브라우저 → 백엔드)   │
+└─────────────────────────────────────────────────────┘
+         │                                │
+         ▼                                ▼
+  Claude API                    FastAPI Backend
+  (LLM 기반 매칭)               (규칙/키워드 기반 매칭)
+```
+
+### AI 모드 (Claude API)
+- 프론트엔드에서 Anthropic Claude API 직접 호출
+- LLM이 로그를 이해하고 런북 매칭 + 근거 생성
+- `VITE_CLAUDE_API_KEY` 필요
+- 응답 품질 높음, API 크레딧 소비
+
+### Mock 모드 (자체 백엔드)
+- 프론트엔드에서 자체 백엔드 API 호출 (`/api/analyze`)
+- 백엔드가 키워드/규칙 기반으로 런북 매칭
+- API 키 불필요, 오프라인 동작 가능
+- 데모·개발 환경에서 활용
+
+---
+
+## 6. 기술 구성
 
 | 영역 | 기술 |
 |------|------|
 | **프론트엔드** | React + TypeScript + Vite + Tailwind CSS v4 |
-| **백엔드** | FastAPI (Python) |
-| **AI 매칭** | LLM (Ollama 로컬 또는 OpenAI 호환 API) + 벡터 임베딩 유사도 검색 |
-| **임베딩** | sentence-transformers (`paraphrase-multilingual-MiniLM-L12-v2`) |
-| **벡터 검색** | FAISS 또는 pgvector |
-| **DB** | PostgreSQL (런북, 장애 이력, 임베딩 벡터) |
-| **통신** | REST API (JSON) |
+| **백엔드 (Mock 모드)** | FastAPI (Python) |
+| **AI 매칭 (AI 모드)** | Claude API (`claude-sonnet-4-6`) |
+| **Mock 매칭** | 키워드 스코어링 + 규칙 기반 |
+| **DB** | PostgreSQL (런북, 장애 이력) |
 | **배포** | Docker Compose (frontend + backend + DB) |
 
 ---
 
-## 6. 백엔드 아키텍처
+## 7. 백엔드 설계
 
 ### 디렉토리 구조
 ```
 backend/
 ├── app/
-│   ├── main.py                # FastAPI 앱 진입점
+│   ├── main.py
 │   ├── api/
-│   │   ├── analyze.py         # POST /analyze — 장애 분석 엔드포인트
-│   │   ├── runbooks.py        # GET/POST/PUT/DELETE /runbooks
-│   │   └── incidents.py       # GET/POST /incidents
+│   │   ├── analyze.py       # POST /api/analyze (Mock 모드용)
+│   │   ├── runbooks.py      # GET/POST/PUT/DELETE /api/runbooks
+│   │   └── incidents.py     # GET/POST /api/incidents
 │   ├── services/
-│   │   ├── matcher.py         # 런북 매칭 로직 (임베딩 유사도)
-│   │   ├── extractor.py       # 로그에서 핵심 에러 추출
-│   │   └── embedder.py        # 텍스트 → 벡터 변환
-│   ├── models/
-│   │   ├── runbook.py         # Runbook ORM 모델
-│   │   └── incident.py        # Incident ORM 모델
-│   └── db.py                  # DB 연결 설정
+│   │   ├── matcher.py       # 키워드 기반 런북 매칭
+│   │   └── extractor.py     # 로그에서 에러 라인 추출
+│   └── db.py
 ├── Dockerfile
 └── requirements.txt
 ```
 
-### 핵심 API 엔드포인트
+### API 엔드포인트
 
-| Method | Path | 설명 |
-|--------|------|------|
-| `POST` | `/api/analyze` | 로그/텍스트 입력 → 런북 매칭 + 유사 장애 반환 |
-| `GET` | `/api/runbooks` | 전체 런북 목록 조회 |
-| `GET` | `/api/runbooks/{id}` | 런북 상세 조회 |
-| `POST` | `/api/runbooks` | 런북 등록 |
-| `PUT` | `/api/runbooks/{id}` | 런북 수정 |
-| `DELETE` | `/api/runbooks/{id}` | 런북 삭제 |
-| `GET` | `/api/incidents` | 장애 이력 목록 조회 |
-| `POST` | `/api/incidents` | 장애 이력 저장 |
+| Method | Path | 모드 | 설명 |
+|--------|------|------|------|
+| `POST` | `/api/analyze` | Mock | 로그/텍스트 → 런북 매칭 + 유사 장애 반환 |
+| `GET` | `/api/runbooks` | 공통 | 런북 목록 조회 |
+| `GET` | `/api/runbooks/{id}` | 공통 | 런북 상세 조회 |
+| `POST` | `/api/runbooks` | 공통 | 런북 등록 |
+| `PUT` | `/api/runbooks/{id}` | 공통 | 런북 수정 |
+| `DELETE` | `/api/runbooks/{id}` | 공통 | 런북 삭제 |
+| `GET` | `/api/incidents` | 공통 | 장애 이력 목록 조회 |
+| `POST` | `/api/incidents` | 공통 | 장애 이력 저장 |
 
-### `/api/analyze` 처리 흐름
+### `/api/analyze` 처리 흐름 (Mock 모드)
 
 ```
 1. 입력 수신 (로그 텍스트)
        ↓
-2. 핵심 에러 추출 (extractor.py)
-   - 정규식 기반 ERROR/EXCEPTION/FATAL 라인 추출
-   - LLM으로 에러 요약 생성
+2. 정규식 기반 핵심 에러 라인 추출
        ↓
-3. 입력 텍스트 임베딩 변환 (embedder.py)
+3. 키워드 스코어링으로 런북 매칭
+   (DB에서 런북 목록 조회 → 태그/설명과 키워드 비교)
        ↓
-4. 런북 벡터 DB에서 코사인 유사도 검색 (matcher.py)
-   → 상위 3개 런북 + 신뢰도 점수
+4. 유사 장애 이력 키워드 검색 (DB)
        ↓
-5. 유사 장애 이력 검색
-   → 상위 5개 이력
-       ↓
-6. 결과 JSON 반환
+5. AI 모드와 동일한 응답 포맷으로 반환
 ```
 
-### AI 매칭 방식
+### 응답 포맷 (AI 모드 / Mock 모드 공통)
 
-**1단계 — 벡터 유사도 (주요)**
-- 런북/장애 이력을 사전에 임베딩하여 DB에 저장
-- 입력 텍스트를 임베딩 후 코사인 유사도 계산
-- 외부 API 호출 없이 로컬에서 동작
+프론트엔드는 모드에 관계없이 동일한 데이터 구조를 받습니다.
 
-**2단계 — LLM 보강 (선택적)**
-- 상위 매칭 결과에 대해 LLM이 매칭 근거 자연어 설명 생성
-- Ollama (로컬) 또는 OpenAI 호환 엔드포인트 사용 가능
-- LLM 없이도 동작 (근거 설명만 생략)
+```json
+{
+  "matches": [
+    {
+      "runbookId": "rb-001",
+      "confidence": 88,
+      "reasoning": "매칭 근거 설명"
+    }
+  ],
+  "extractedErrors": ["에러 메시지 1", "에러 메시지 2"],
+  "summary": "장애 상황 한줄 요약",
+  "similarIncidentIds": ["inc-001", "inc-003"]
+}
+```
 
 ---
 
-## 7. 데이터 모델
+## 8. 데이터 모델
 
 ### Runbook
-```python
-id: str
-title: str
-description: str
-tags: list[str]
-severity: Literal['P1', 'P2', 'P3', 'P4']
-steps: list[RunbookStep]
-embedding: list[float]  # 벡터 (DB 저장)
-created_at: datetime
-updated_at: datetime
+```
+id, title, description, tags[], severity, steps[], created_at, updated_at
 ```
 
 ### Incident
-```python
-id: str
-date: datetime
-service: str
-symptom: str
-cause: str
-resolution: str
-duration_minutes: int
-severity: Literal['P1', 'P2', 'P3', 'P4']
-related_runbook_id: str
-embedding: list[float]  # 벡터 (DB 저장)
+```
+id, date, service, symptom, cause, resolution, duration_minutes, severity, related_runbook_id
 ```
 
 ---
 
-## 8. 데모 시나리오 (3분)
+## 9. 데모 시나리오 (3분)
 
-> **상황**: 새벽 3시, 온콜 엔지니어에게 슬랙 알림이 옵니다.
+> **상황**: 새벽 3시, 온콜 엔지니어에게 슬랙 알림.
 > "payment-service 5xx 에러 급증, 에러율 15% 돌파"
 
-1. **[0:00~0:30]** 대시보드에 실제 로그파일(.log)을 드래그앤드롭으로 업로드
-2. **[0:30~1:00]** 백엔드가 로그에서 핵심 에러 추출 → "API 서버 5xx 에러 급증 대응" 런북 자동 매칭 (신뢰도 92%)
-3. **[1:00~1:30]** 체크리스트 단계별로 진행 — 각 단계 체크하며 타임라인 자동 기록
-4. **[1:30~2:15]** 우측 패널에서 과거 유사 장애 3건 확인 — 인사이트 발견
-5. **[2:15~3:00]** 대응 완료 후 타임라인 리뷰, 확장 가능성 언급
+1. **[0:00~0:30]** Mock 모드로 로그파일 드래그앤드롭 업로드
+2. **[0:30~1:00]** 백엔드가 에러 추출 → 런북 자동 매칭 (신뢰도 92%)
+3. **[1:00~1:30]** 체크리스트 단계별 진행, 타임라인 자동 기록
+4. **[1:30~2:15]** 과거 유사 장애 3건 확인, 인사이트 발견
+5. **[2:15~3:00]** AI 모드 전환 시 Claude API로 더 정확한 분석 가능함을 시연
 
 ---
 
-## 9. 확장 가능성
+## 10. 확장 가능성
 
 - 슬랙/PagerDuty 웹훅 연동으로 자동 장애 인풋
 - 포스트모템 리포트 자동 생성
 - 런북 자동 업데이트 (장애 해결 후 새로운 정보 반영)
 - 팀별 장애 통계 대시보드
-- 런북 미존재 시 AI가 임시 대응 가이드 자동 생성
+- Mock 백엔드에 벡터 임베딩 기반 유사도 검색 추가
