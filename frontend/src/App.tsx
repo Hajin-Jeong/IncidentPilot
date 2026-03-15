@@ -10,7 +10,7 @@ import RunbookCatalog from './components/RunbookCatalog';
 import type { AnalysisResult, ViewMode } from './types';
 import type { Runbook, Incident } from './types';
 import { analyzeIncident, findSimilarIncidents } from './services/claude';
-import { mockAnalyzeIncident, mockFindSimilarIncidents } from './services/mock';
+import { backendAnalyzeIncident } from './services/backend';
 import { keywordMatchIncidents } from './services/incidentMatcher';
 import incidentsData from './data/incidents.json';
 import runbooksData from './data/runbooks.json';
@@ -32,26 +32,21 @@ export default function App() {
     setInputSummary(fileName ? `파일: ${fileName}` : input.slice(0, 80) + (input.length > 80 ? '...' : ''));
 
     try {
-      let aiResult, similarIncidents;
-
       if (mockMode) {
-        [aiResult, similarIncidents] = await Promise.all([
-          mockAnalyzeIncident(input),
-          Promise.resolve(mockFindSimilarIncidents(input, incidents)),
-        ]);
+        const result = await backendAnalyzeIncident(input);
+        setAnalysisResult(result);
       } else {
-        [aiResult, similarIncidents] = await Promise.all([
+        const [aiResult, similarIncidents] = await Promise.all([
           analyzeIncident(input),
-          findSimilarIncidents(input, incidents).catch(() => mockFindSimilarIncidents(input, incidents)),
+          findSimilarIncidents(input, incidents).catch(() => keywordMatchIncidents(input, incidents)),
         ]);
+        setAnalysisResult({
+          matches: aiResult.matches,
+          extractedErrors: aiResult.extractedErrors,
+          summary: aiResult.summary,
+          similarIncidents,
+        });
       }
-
-      setAnalysisResult({
-        matches: aiResult.matches,
-        extractedErrors: aiResult.extractedErrors,
-        summary: aiResult.summary,
-        similarIncidents,
-      });
       setView('analysis');
     } catch (err) {
       const message = err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.';
