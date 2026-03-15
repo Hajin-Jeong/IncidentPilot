@@ -37,7 +37,7 @@ export default function RunbookList({ matches, selectedId, onSelect, extractedEr
           </div>
           <ul className="space-y-1.5">
             {extractedErrors.map((err, i) => (
-              <li key={i} className="text-xs font-mono text-red-300/80 bg-red-950/40 px-3 py-1.5 rounded-lg">
+              <li key={i} className="text-xs font-mono text-red-300/80 bg-red-950/40 px-3 py-1.5 rounded-lg break-all overflow-hidden">
                 {err}
               </li>
             ))}

@@ -74,7 +74,10 @@ def match_runbooks(text: str, db: Session) -> list[MatchResult]:
             scored.append((score, rb))
 
     scored.sort(key=lambda x: x[0], reverse=True)
-    top = scored[:3] if scored else [(0, rb) for rb in runbooks[:2]]
+    top = scored[:3] if scored else [(0, rb) for rb in runbooks[:3]]
+
+    if not top:
+        return []
 
     max_score = top[0][0] if top[0][0] > 0 else 1
     results: list[MatchResult] = []
