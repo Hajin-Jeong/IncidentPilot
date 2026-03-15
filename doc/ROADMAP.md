@@ -81,7 +81,7 @@
 
 ## 백엔드 개발 일감
 
-### Task B1: 프로젝트 기반 세팅 🔲
+### Task B1: 프로젝트 기반 세팅 ✅
 - `backend/` 폴더 생성 및 FastAPI 프로젝트 초기화
 - `requirements.txt` 작성 (`fastapi`, `uvicorn`, `sqlalchemy`, `psycopg2-binary`, `pydantic`)
 - `.env.example` 생성 (`DATABASE_URL`, `ALLOWED_ORIGINS`)
@@ -89,7 +89,7 @@
   - 프론트엔드와 공유하는 응답 포맷 (`AnalyzeResponse`) 정의
 - **산출물**: 실행 가능한 FastAPI 앱 뼈대 (`uvicorn app.main:app`)
 
-### Task B2: DB 모델 & 마이그레이션 🔲
+### Task B2: DB 모델 & 마이그레이션 ✅
 - SQLAlchemy ORM 모델 정의 (`models/runbook.py`, `models/incident.py`)
   - Runbook: id, title, description, tags, severity, steps(JSON), created_at, updated_at
   - Incident: id, date, service, symptom, cause, resolution, duration_minutes, severity, related_runbook_id
@@ -98,7 +98,7 @@
   - 프론트엔드 `runbooks.json`, `incidents.json` 데이터를 DB에 삽입
 - **산출물**: DB 스키마 완성 + 시드 데이터 적재
 
-### Task B3: 런북 & 장애 이력 CRUD API 🔲
+### Task B3: 런북 & 장애 이력 CRUD API ✅
 - `api/runbooks.py`
   - `GET /api/runbooks` — 전체 런북 목록 (페이지네이션)
   - `GET /api/runbooks/{id}` — 런북 상세
@@ -111,7 +111,7 @@
   - `POST /api/incidents` — 장애 이력 저장
 - **산출물**: 런북/장애 이력 REST API 완성
 
-### Task B4: Mock 분석 엔진 🔲
+### Task B4: Mock 분석 엔진 ✅
 - `services/extractor.py` — 로그 텍스트에서 핵심 에러 라인 추출
   - ERROR / EXCEPTION / FATAL / OOM 패턴 정규식 추출
   - 중복 제거 후 상위 5개 반환
@@ -124,7 +124,7 @@
   - 응답 포맷: 프론트엔드 AI 모드와 동일한 JSON 구조
 - **산출물**: Mock 모드 분석 API 완성, 프론트엔드 연동 가능
 
-### Task B5: 프론트엔드 연동 🔲
+### Task B5: 프론트엔드 연동 ✅
 - 프론트엔드 `services/mock.ts` 로직을 백엔드 API 호출로 교체
   - `POST /api/analyze` 호출로 대체
   - `GET /api/runbooks`, `GET /api/incidents` 호출로 정적 JSON 대체
@@ -132,7 +132,7 @@
 - CORS 설정 확인 (백엔드 `ALLOWED_ORIGINS`)
 - **산출물**: Mock 모드에서 백엔드와 완전 연동
 
-### Task B6: Docker Compose 구성 🔲
+### Task B6: Docker Compose 구성 ✅
 - `backend/Dockerfile` 작성
 - 루트 `docker-compose.yml` 작성
   - `frontend` (Vite 빌드 + Nginx)
@@ -165,6 +165,7 @@ IncidentPilot/
 │   │   │       └── redis-oom-error.log
 │   │   ├── services/
 │   │   │   ├── claude.ts
+│   │   │   ├── backend.ts
 │   │   │   ├── incidentMatcher.ts
 │   │   │   └── mock.ts
 │   │   ├── components/
@@ -184,9 +185,11 @@ IncidentPilot/
 │   ├── public/
 │   ├── package.json
 │   └── vite.config.ts
-└── backend/                         # 백엔드 (FastAPI) — 개발 예정
+└── backend/                         # 백엔드 (FastAPI)
     ├── app/
     │   ├── main.py
+    │   ├── config.py
+    │   ├── database.py
     │   ├── api/
     │   │   ├── analyze.py
     │   │   ├── runbooks.py
@@ -197,8 +200,14 @@ IncidentPilot/
     │   ├── models/
     │   │   ├── runbook.py
     │   │   └── incident.py
-    │   └── db.py
+    │   └── schemas/
+    │       ├── analyze.py
+    │       ├── runbook.py
+    │       └── incident.py
+    ├── scripts/
+    │   └── seed.py
     ├── Dockerfile
+    ├── .env.example
     └── requirements.txt
 ```
 

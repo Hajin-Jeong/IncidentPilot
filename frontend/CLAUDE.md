@@ -32,13 +32,15 @@ Single-page app with state-based view switching — no router. Two views: `dashb
 
 `src/services/claude.ts` — real Claude API calls (`claude-sonnet-4-6`). Both `analyzeIncident` and `findSimilarIncidents` return structured JSON parsed from the model response.
 
-`src/services/mock.ts` — offline fallback. Uses keyword scoring against `RULES` to pick runbooks, scales confidence scores, extracts error lines from the raw input. Activated by the Mock 모드 toggle in `App.tsx`.
+`src/services/backend.ts` — Mock mode calls the self-built FastAPI backend (`POST /api/analyze` at `VITE_BACKEND_URL`). The backend returns `{ matches, extractedErrors, summary, similarIncidentIds }` using keyword scoring; the frontend resolves IDs → full objects via the static JSON.
 
-`src/services/incidentMatcher.ts` — keyword-based incident scorer used as a fallback when `findSimilarIncidents` (Claude) throws.
+`src/services/mock.ts` — legacy local keyword scorer, no longer used in the main flow. Kept for reference.
+
+`src/services/incidentMatcher.ts` — keyword-based incident scorer used as a fallback when `findSimilarIncidents` (Claude) throws, and for direct runbook catalog selections.
 
 ### Static data
 
-All data lives in `src/data/` as imported JSON — no backend, no DB.
+All data lives in `src/data/` as imported JSON — used both as the source of truth in Claude mode and as ID-lookup tables in Mock mode.
 - `runbooks.json` — 6 runbooks, each with typed `steps[]` (commands, estimatedMinutes, notes)
 - `incidents.json` — 13 past incidents, each with `relatedRunbookId` linking to a runbook
 - `sample-logs/` — 3 demo `.log` files for drag-and-drop demos
